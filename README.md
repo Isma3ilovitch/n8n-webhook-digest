@@ -18,7 +18,7 @@ _____________
 ______________________________________
 ## 🏗️ How It Works
 
-# The workflow is built on a simple but powerful principle: Collect now, process later.
+### The workflow is built on a simple but powerful principle: Collect now, process later.
 
 -Collection: Dedicated webhook nodes act as endpoints, receiving and storing payloads from external services.
 
