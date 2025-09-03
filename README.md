@@ -88,7 +88,7 @@ ____________________________________________________
 ### 5. Test the Workflow
 -Send test data to your webhook URLs using curl or Postman:
 
-bash ```
+```bash
 # Test a signup
 curl -X POST https://your-n8n.instance.com/webhook/signup \
 -H "Content-Type: application/json" \
@@ -97,4 +97,10 @@ curl -X POST https://your-n8n.instance.com/webhook/signup \
 # Test an error
 curl -X POST https://your-n8n.instance.com/webhook/error \
 -H "Content-Type: application/json" \
--d '{"message": "Test Error", "severity": "high"}'```
+-d '{"message": "Test Error", "severity": "high"}'
+```
+-Manually execute the Schedule Trigger node. You should see a digest message appear in your configured Slack channel or inbox.
+
+___________________________
+## 📄 License
+-This project is licensed under the MIT License - see the LICENSE file for details.
