@@ -27,12 +27,74 @@ ______________________________________
 -Processing: The workflow fetches all data received since the last trigger, processes it (e.g., counts events, formats messages), and generates a summary.
 
 -Delivery: The final digest is sent to a notification channel like Slack.
+______________________________________
+## 📋 Prerequisites
 
-bash```graph LR
-    A[External Service 1] -->|POST| B[Webhook 1]
-    C[External Service 2] -->|POST| D[Webhook 2]
-    E[Schedule Trigger] --> F{Process & Format}
-    B -.-> E
-    D -.-> E
-    F -->|Digest Message| G[Slack]
-    F -->|Digest Message| H[Email] ```
+### Before you import this workflow, ensure you have:
+
+-An n8n instance (either self-hosted or n8n.cloud)
+
+-Access to configure credentials in n8n (for Slack, Gmail, etc.)
+
+-The URL of your n8n instance (e.g., https://your-n8n.example.com)
+____________________________________________________
+## 🚀 Installation & Setup
+### 1. Import the Workflow
+-Download the provided Smart-Webhook-Digest.json file from this repository.
+
+-In your n8n instance, go to Settings > Workflows.
+
+-Click Import and upload the JSON file.
+
+### 2. Configure Webhook URLs
+-The workflow will have two main webhook nodes. You need to get their unique URLs and provide them to your services.
+
+-Activate the workflow.
+
+-Open the Webhook node named 🪣 Receive Signups (or similar).
+
+-Click Execute Node. n8n will generate a unique URL.
+
+-Copy this URL and provide it to your form/service (e.g., in Typeform's "Webhook" section).
+
+-Repeat the process for the 🪣 Receive Errors webhook node.
+
+-Example Webhook URL: https://your-n8n.instance.com/webhook/signup
+
+### 3. Configure the Schedule
+-Open the Schedule Trigger node to set when you want to receive your digest.
+
+-Cron Expression: Modify the cron expression to match your desired schedule.
+
+-Example: 0 17 * * 1-5 (Every weekday at 5:00 PM UTC).
+
+### 4. Configure the Destination (Slack/Email)
+-For Slack:
+-Ensure you have configured Slack API credentials in n8n.
+
+-Open the Slack node.
+
+-Select your authenticated Slack account.
+
+-Choose the Channel where you want the digest to be posted.
+
+-For Email (Gmail example):
+-Configure Gmail API credentials in n8n.
+
+-Open the Gmail node.
+
+-Set the recipient email, subject, and body. Use expressions like {{ $json.summary }} to insert the digest content.
+
+### 5. Test the Workflow
+-Send test data to your webhook URLs using curl or Postman:
+
+bash ```
+# Test a signup
+curl -X POST https://your-n8n.instance.com/webhook/signup \
+-H "Content-Type: application/json" \
+-d '{"email": "test@example.com", "name": "Test User"}'```
+
+# Test an error
+curl -X POST https://your-n8n.instance.com/webhook/error \
+-H "Content-Type: application/json" \
+-d '{"message": "Test Error", "severity": "high"}'```
