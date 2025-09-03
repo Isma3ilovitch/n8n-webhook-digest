@@ -27,3 +27,12 @@ ______________________________________
 -Processing: The workflow fetches all data received since the last trigger, processes it (e.g., counts events, formats messages), and generates a summary.
 
 -Delivery: The final digest is sent to a notification channel like Slack.
+
+bash```graph LR
+    A[External Service 1] -->|POST| B[Webhook 1]
+    C[External Service 2] -->|POST| D[Webhook 2]
+    E[Schedule Trigger] --> F{Process & Format}
+    B -.-> E
+    D -.-> E
+    F -->|Digest Message| G[Slack]
+    F -->|Digest Message| H[Email] ```
