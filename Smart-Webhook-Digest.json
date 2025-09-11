@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "signup",
+        "options": {}
+      },
+      "id": "48459d97-516e-4559-8249-7facdb35cbd8",
+      "name": "Webhook – Signup",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -240
+      ],
+      "webhookId": "signup-webhook"
+    },
+    {
+      "parameters": {
+        "path": "error",
+        "options": {}
+      },
+      "id": "7a3b5a85-ff95-4a45-a008-dc3f2c65dbde",
+      "name": "Webhook – Error",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        16
+      ],
+      "webhookId": "error-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialise counters\nlet signupsCount = 0;\nlet errorsCount   = 0;\nlet errorMessages = [];\n\n// Loop through all items the schedule trigger collected\nfor (const item of items) {\n  const path = item.json.__n8n_webhook_path;\n\n  if (path === 'signup') {\n    signupsCount++;\n  }\n  if (path === 'error') {\n    errorsCount++;\n    // Optional: collect the actual error message\n    // Assumes your error webhook sends { \"message\": \"...\" }\n    if (item.json.message) {\n      errorMessages.push(item.json.message);\n    }\n  }\n}\n\nconst date = new Date().toLocaleDateString();\nconst summary = `📊 Daily Digest – ${date}\n✅ New Signups: ${signupsCount}\n❌ Server Errors: ${errorsCount}`;\n\nreturn [\n  {\n    json: {\n      signups: signupsCount,\n      errors: errorsCount,\n      error_list: errorMessages,\n      summary\n    }\n  }\n];"
+      },
+      "id": "4b08f982-e816-4e5b-91e7-412e84d6505c",
+      "name": "Count Signups & Errors",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        -48
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.summary }}",
+        "otherOptions": {}
+      },
+      "id": "b6a15281-9571-4924-bcf3-133eeeab39ab",
+      "name": "Slack – Post Digest",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -224
+      ],
+      "webhookId": "a36f3a16-d8cb-4c72-b7bc-a8d221f80777",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "subject": "=",
+        "emailType": "text",
+        "message": "={{ $json.summary }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        96
+      ],
+      "id": "52d0bd2f-db35-479a-a4fe-2bc57e7b4833",
+      "name": "Send a message",
+      "webhookId": "97938141-6a55-405c-88d9-115c1b65f360"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 17 * * 1-5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "578349e2-5e31-43d2-bfb0-5b67f5bd9952",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "Count Signups & Errors": {
+      "main": [
+        [
+          {
+            "node": "Slack – Post Digest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Count Signups & Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "c6d9fa9cb0d8bf883fc06c4e76493528e541cefa7746e2e643330342414cd4e9"
+  }
+}
